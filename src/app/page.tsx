@@ -75,7 +75,6 @@ export default function Home() {
         />
 
         <ResultDisplay
-          analyzing={analyzing}
           result={result}
           onReset={() => { setImage(null); setResult(null); }}
         />
