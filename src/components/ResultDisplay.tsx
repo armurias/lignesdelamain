@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import ReactMarkdown from "react-markdown";
+import { useState } from "react";
 
 interface AnalysisResult {
     error?: string;
@@ -32,6 +33,28 @@ export default function ResultDisplay({ result, onReset }: ResultDisplayProps) {
         // Fallback for plain text legacy results
         parsedResult = { atmosphere: result };
     }
+
+    const [loadingCheckout, setLoadingCheckout] = useState(false);
+
+    const handleCheckout = async () => {
+        try {
+            setLoadingCheckout(true);
+            const res = await fetch('/api/checkout', {
+                method: 'POST',
+            });
+            const data = await res.json();
+            if (data.url) {
+                window.location.href = data.url;
+            } else {
+                alert("Erreur lors de l'initialisation du paiement.");
+                setLoadingCheckout(false);
+            }
+        } catch (error) {
+            console.error("Checkout error:", error);
+            alert("Une erreur est survenue.");
+            setLoadingCheckout(false);
+        }
+    };
 
     if (parsedResult.error) {
         return (
@@ -108,11 +131,22 @@ export default function ResultDisplay({ result, onReset }: ResultDisplayProps) {
                         </p>
 
                         <button
-                            className="relative z-10 py-3 px-8 rounded-xl bg-gradient-to-r from-yellow-500 to-amber-600 hover:from-yellow-400 hover:to-amber-500 text-white font-bold shadow-lg shadow-yellow-900/20 transition-all transform hover:scale-105 group"
-                            onClick={() => alert("Paiement Stripe à implémenter ici !")}
+                            className="relative z-10 py-3 px-8 rounded-xl bg-gradient-to-r from-yellow-500 to-amber-600 hover:from-yellow-400 hover:to-amber-500 text-white font-bold shadow-lg shadow-yellow-900/20 transition-all transform hover:scale-105 group disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled={loadingCheckout}
+                            onClick={handleCheckout}
                         >
                             <span className="flex items-center justify-center gap-2">
-                                🔓 Débloquer le rapport complet (2.99€)
+                                {loadingCheckout ? (
+                                    <>
+                                        <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        Redirection...
+                                    </>
+                                ) : (
+                                    <>🔓 Débloquer le rapport complet (2.99€)</>
+                                )}
                             </span>
                         </button>
                     </div>
