@@ -77,8 +77,11 @@ export default function Home() {
         />
       </main>
 
-      <footer className="mt-auto py-6 text-center text-sm text-gray-500">
-        <p>&copy; {new Date().getFullYear()} Lignes de la Main. Ceci est une démonstration à des fins de divertissement uniquement.</p>
+      <footer className="mt-auto py-6 text-center text-xs text-gray-500 max-w-lg mx-auto">
+        <p>&copy; {new Date().getFullYear()} Lignes de la Main.</p>
+        <p className="mt-2">
+          ⚠️ <strong>Avertissement :</strong> Ce service est réalisé à des fins de <strong>divertissement uniquement</strong>. Les résultats sont générés par une intelligence artificielle et ne constituent en aucun cas une vérité absolue ou un conseil professionnel.
+        </p>
       </footer>
     </div>
   );

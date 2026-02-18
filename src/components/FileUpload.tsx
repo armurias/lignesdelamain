@@ -49,18 +49,23 @@ export default function FileUpload({ image, onImageChange, analyzing, result, on
             onDrop={handleDrop}
         >
             {!image ? (
-                <div
-                    className="flex flex-col items-center gap-6 cursor-pointer py-10"
-                    onClick={() => fileInputRef.current?.click()}
-                >
-                    <div className="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center border border-white/10">
-                        <Upload className="w-8 h-8 text-purple-400" />
+                <>
+                    <div
+                        className="flex flex-col items-center gap-6 cursor-pointer py-10"
+                        onClick={() => fileInputRef.current?.click()}
+                    >
+                        <div className="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center border border-white/10">
+                            <Upload className="w-8 h-8 text-purple-400" />
+                        </div>
+                        <div className="space-y-2">
+                            <h3 className="text-xl font-semibold">Télécharger une photo</h3>
+                            <p className="text-sm text-gray-400">Glissez-déposez ou cliquez pour parcourir</p>
+                        </div>
                     </div>
-                    <div className="space-y-2">
-                        <h3 className="text-xl font-semibold">Télécharger une photo</h3>
-                        <p className="text-sm text-gray-400">Glissez-déposez ou cliquez pour parcourir</p>
-                    </div>
-                </div>
+                    <p className="mt-4 text-xs text-white/40 flex items-center justify-center gap-1">
+                        🔒 <span className="italic">Photo analysée instantanément et non conservée.</span>
+                    </p>
+                </>
             ) : (
                 <div className="space-y-6">
                     <div className="relative w-full aspect-[3/4] rounded-lg overflow-hidden border border-white/20">
