@@ -5,7 +5,7 @@ export const runtime = 'edge';
 
 interface SendEmailRequest {
     email: string;
-    result: any; // Using any for flexibility with the JSON structure
+    result: any;
     date: string;
 }
 
@@ -20,10 +20,10 @@ export async function POST(req: Request) {
             );
         }
 
-        const apiKey = process.env.BREVO_API_KEY;
+        const apiKey = process.env.RESEND_API_KEY;
 
         if (!apiKey) {
-            console.error("BREVO_API_KEY is missing");
+            console.error("RESEND_API_KEY is missing");
             return NextResponse.json(
                 { error: "Server configuration error" },
                 { status: 500 }
@@ -31,8 +31,6 @@ export async function POST(req: Request) {
         }
 
         // Format the analysis for the email
-        // We'll create a simple HTML structure
-
         let analysisHtml = `
             <div style="font-family: sans-serif; color: #333; max-width: 600px; margin: 0 auto;">
                 <div style="background-color: #4a044e; color: white; padding: 20px; text-align: center; border-radius: 10px 10px 0 0;">
@@ -72,32 +70,24 @@ export async function POST(req: Request) {
             </div>
         `;
 
-        const brevoResponse = await fetch("https://api.brevo.com/v3/smtp/email", {
+        const resendResponse = await fetch("https://api.resend.com/emails", {
             method: "POST",
             headers: {
-                "accept": "application/json",
-                "api-key": apiKey,
-                "content-type": "application/json"
+                "Authorization": `Bearer ${apiKey}`,
+                "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                sender: {
-                    name: "Lignes de la Main (IA)",
-                    email: "mystic@lignesdelamain.com" // You might want to update this to a verified sender if needed, but Brevo usually allows some flexibility or use your login email
-                },
-                to: [
-                    {
-                        email: email
-                    }
-                ],
+                from: "Lignes de la Main <onboarding@resend.dev>", // Default testing sender for Resend
+                to: [email],
                 subject: "✨ Votre lecture des lignes de la main",
-                htmlContent: analysisHtml
+                html: analysisHtml
             })
         });
 
-        if (!brevoResponse.ok) {
-            const errorData = await brevoResponse.json();
-            console.error("Brevo API Error:", errorData);
-            throw new Error("Failed to send email via Brevo");
+        if (!resendResponse.ok) {
+            const errorData = await resendResponse.json();
+            console.error("Resend API Error:", errorData);
+            throw new Error("Failed to send email via Resend");
         }
 
         return NextResponse.json({ success: true });
