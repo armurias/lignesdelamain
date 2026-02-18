@@ -10,7 +10,7 @@
     "pages:build": "npx @cloudflare/next-on-pages"
   },
   "dependencies": {
-    "groq-sdk": "^0.37.0",
+    "@google/generative-ai": "^0.24.1",
     "lucide-react": "^0.574.0",
     "next": "15.1.6",
     "openai": "^6.22.0",
