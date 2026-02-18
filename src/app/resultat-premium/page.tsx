@@ -33,7 +33,7 @@ export default function PremiumSuccessPage() {
                 </h1>
 
                 <p className="text-gray-300 mb-8 leading-relaxed">
-                    Votre destinée est désormais débloquée. Vous avez accès à l'analyse complète de vos lignes de la main.
+                    Votre destinée est désormais débloquée. Vous avez accès à l&apos;analyse complète de vos lignes de la main.
                 </p>
 
                 <Link

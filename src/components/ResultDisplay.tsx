@@ -24,6 +24,9 @@ interface ResultDisplayProps {
 }
 
 export default function ResultDisplay({ result, onReset }: ResultDisplayProps) {
+    // HOOKS MUST BE AT THE TOP LEVEL
+    const [loadingCheckout, setLoadingCheckout] = useState(false);
+
     if (!result) return null;
 
     let parsedResult: AnalysisResult;
@@ -33,8 +36,6 @@ export default function ResultDisplay({ result, onReset }: ResultDisplayProps) {
         // Fallback for plain text legacy results
         parsedResult = { atmosphere: result };
     }
-
-    const [loadingCheckout, setLoadingCheckout] = useState(false);
 
     const handleCheckout = async () => {
         try {
@@ -127,7 +128,7 @@ export default function ResultDisplay({ result, onReset }: ResultDisplayProps) {
                             Débloquez votre Destinée
                         </h4>
                         <p className="text-sm text-gray-400 mb-6">
-                            Accédez à l'analyse complète de vos lignes et à vos prédictions détaillées pour les 12 prochains mois.
+                            Accédez à l&apos;analyse complète de vos lignes et à vos prédictions détaillées pour les 12 prochains mois.
                         </p>
 
                         <button
