@@ -59,7 +59,7 @@ Tone: Use "Tu" or "Vous" consistently (preferred "Vous"). Be benevolent, mysteri
     } catch (error) {
         console.error("Groq API Error:", error);
         return NextResponse.json(
-            { error: "Failed to analyze the image." },
+            { error: `Failed: ${error instanceof Error ? error.message : String(error)}` },
             { status: 500 }
         );
     }
