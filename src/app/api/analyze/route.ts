@@ -34,7 +34,8 @@ export async function POST(req: Request) {
         }
 
         const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        // Using -latest alias which is often more stable for v1beta or fall back to specific version if listed
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
 
         const prompt = `You are an ancient and wise palm reader with a mystical aura. Your task is to analyze the image of a palm provided.
 
@@ -67,8 +68,21 @@ Tone: Use "Tu" or "Vous" consistently (preferred "Vous"). Be benevolent, mysteri
 
     } catch (error) {
         console.error("Gemini API Error:", error);
+
+        let errorMsg = error instanceof Error ? error.message : String(error);
+
+        // EXTRA DEBUG: Try to list models if permitted, to find the valid name
+        try {
+            // We can't easily list models via the SDK helper without a separate call.
+            // We will try to fetch from the API directly if the SDK fails, or just ask the user to check.
+            // But let's try to pass a hint in the error.
+            errorMsg += " || Hint: Check if 'gemini-1.5-flash' is available in your region.";
+        } catch (e) {
+            // ignore
+        }
+
         return NextResponse.json(
-            { error: `Failed: ${error instanceof Error ? error.message : String(error)}` },
+            { error: `Failed: ${errorMsg}` },
             { status: 500 }
         );
     }
