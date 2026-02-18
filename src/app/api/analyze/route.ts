@@ -36,11 +36,11 @@ export async function POST(req: Request) {
         const genAI = new GoogleGenerativeAI(apiKey);
 
         // List of models to try in order of preference
-        // Based on user's available models: gemini-2.0-flash, gemini-2.5-flash, etc.
-        const candidateModels = ["gemini-2.0-flash", "gemini-2.5-flash", "gemini-2.0-flash-lite"];
+        // Removing 'lite' as it reported 0 quota. Prioritizing 2.5 and specific versions.
+        const candidateModels = ["gemini-2.5-flash", "gemini-2.0-flash-001", "gemini-2.0-flash"];
 
         let result = null;
-        let lastError = null;
+        let errors = [];
 
         const prompt = `You are an ancient and wise palm reader with a mystical aura. Your task is to analyze the image of a palm provided.
 
@@ -73,12 +73,12 @@ Tone: Use "Tu" or "Vous" consistently (preferred "Vous"). Be benevolent, mysteri
                 if (result) break; // Success!
             } catch (e) {
                 console.warn(`Failed with model ${modelName}:`, e);
-                lastError = e;
+                errors.push(`${modelName}: ${e instanceof Error ? e.message : String(e)}`);
             }
         }
 
         if (!result) {
-            throw lastError || new Error("All models failed.");
+            throw new Error("All models failed. Details: " + errors.join(" | "));
         }
 
         const response = await result.response;
