@@ -16,7 +16,7 @@ export async function POST(req: Request) {
         }
 
         // Try both process.env and Cloudflare context
-        const apiKey = process.env.GROQ_API_KEY || getRequestContext().env.GROQ_API_KEY;
+        const apiKey = process.env.GROQ_API_KEY || (getRequestContext().env as CloudflareEnv).GROQ_API_KEY;
 
         if (!apiKey) {
             throw new Error("GROQ_API_KEY is missing. Please check Cloudflare Settings.");
