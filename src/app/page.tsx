@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Sparkles, Hand } from "lucide-react";
 import FileUpload from "@/components/FileUpload";
 import ResultDisplay from "@/components/ResultDisplay";
@@ -10,8 +10,9 @@ export default function Home() {
   const [analyzing, setAnalyzing] = useState(false);
   const [result, setResult] = useState<string | null>(null);
 
-  const analyzeHand = async () => {
-    if (!image) return;
+  const analyzeHand = async (imgToAnalyze?: string, mode: 'free' | 'premium' = 'free') => {
+    const currentImage = imgToAnalyze || image;
+    if (!currentImage) return;
 
     setAnalyzing(true);
     setResult(null);
@@ -22,13 +23,19 @@ export default function Home() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ image }),
+        body: JSON.stringify({ image: currentImage, mode }), // Pass mode here
       });
 
       const data = await response.json();
 
       if (response.ok) {
         setResult(JSON.stringify(data));
+        // Clear storage if premium successful
+        if (mode === 'premium') {
+          localStorage.removeItem('palm_image_for_premium');
+          // Remove query param to clean URL
+          window.history.replaceState({}, '', '/');
+        }
       } else {
         setResult("Les esprits sont brouillés... Veuillez réessayer plus tard. (Erreur: " + (data.error || "Inconnue") + ")");
       }
@@ -38,6 +45,24 @@ export default function Home() {
       setAnalyzing(false);
     }
   };
+
+  // Check for premium return
+  useEffect(() => {
+    // Check if we are returning from a successful payment
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const mode = params.get('mode');
+
+      if (mode === 'premium') {
+        const savedImage = localStorage.getItem('palm_image_for_premium');
+        if (savedImage) {
+          setImage(savedImage);
+          // Trigger premium analysis immediately
+          analyzeHand(savedImage, 'premium');
+        }
+      }
+    }
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-8 gap-8 relative overflow-hidden">
@@ -71,11 +96,12 @@ export default function Home() {
           onImageChange={setImage}
           analyzing={analyzing}
           result={result}
-          onAnalyze={analyzeHand}
+          onAnalyze={() => analyzeHand()}
         />
 
         <ResultDisplay
           result={result}
+          image={image}
           onReset={() => { setImage(null); setResult(null); }}
         />
       </main>

@@ -20,10 +20,11 @@ interface AnalysisResult {
 
 interface ResultDisplayProps {
     result: string | null; // We receive the JSON string from the API
+    image: string | null;
     onReset: () => void;
 }
 
-export default function ResultDisplay({ result, onReset }: ResultDisplayProps) {
+export default function ResultDisplay({ result, image, onReset }: ResultDisplayProps) {
     // HOOKS MUST BE AT THE TOP LEVEL
     const [loadingCheckout, setLoadingCheckout] = useState(false);
 
@@ -40,6 +41,12 @@ export default function ResultDisplay({ result, onReset }: ResultDisplayProps) {
     const handleCheckout = async () => {
         try {
             setLoadingCheckout(true);
+
+            // Save the image for post-payment analysis
+            if (image) {
+                localStorage.setItem('palm_image_for_premium', image);
+            }
+
             const res = await fetch('/api/checkout', {
                 method: 'POST',
             });
