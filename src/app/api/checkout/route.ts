@@ -14,7 +14,6 @@ export async function POST(req: Request) {
         }
 
         const stripe = new Stripe(STRIPE_SECRET_KEY, {
-            apiVersion: '2023-10-16', // Use a stable version
             typescript: true,
         });
 
