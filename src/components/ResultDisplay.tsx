@@ -159,6 +159,48 @@ export default function ResultDisplay({ result, image, onReset }: ResultDisplayP
                         </button>
                     </div>
                 )}
+
+                {/* Email Section */}
+                <div className="mt-8 pt-6 border-t border-white/10">
+                    {!emailSent ? (
+                        <div className="flex flex-col gap-3">
+                            <h4 className="text-sm font-semibold text-purple-200 text-center mb-1">
+                                📩 Recevoir ce résultat par email
+                            </h4>
+                            <form
+                                onSubmit={(e) => {
+                                    e.preventDefault();
+                                    handleSendEmail();
+                                }}
+                                className="flex gap-2"
+                            >
+                                <input
+                                    type="email"
+                                    placeholder="votre@email.com"
+                                    required
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    className="flex-1 bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white placeholder-white/30 focus:outline-none focus:border-purple-400 text-sm"
+                                />
+                                <button
+                                    type="submit"
+                                    disabled={sendingEmail || !email}
+                                    className="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                                >
+                                    {sendingEmail ? (
+                                        <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                    ) : (
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                                    )}
+                                </button>
+                            </form>
+                        </div>
+                    ) : (
+                        <div className="text-center text-green-300 text-sm py-2 bg-green-500/10 rounded-lg animate-fade-in border border-green-500/20">
+                            ✨ Email envoyé avec succès !
+                        </div>
+                    )}
+                </div>
             </div>
 
             <button
