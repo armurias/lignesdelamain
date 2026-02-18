@@ -66,8 +66,32 @@ Tone: Use "Tu" or "Vous" consistently (preferred "Vous"). Be benevolent, mysteri
         return NextResponse.json({ result: analysis });
     } catch (error) {
         console.error("Groq API Error:", error);
+
+        let errorMsg = error instanceof Error ? error.message : String(error);
+
+        // Attempt to list models to help debug the "not found" issue
+        try {
+            // Re-instantiate if needed, but we can reuse the scope if defined, 
+            // but safely we recreate it or just use the one from try block if we move the declaration up?
+            // Simpler: just create a new light instance or assume the error isn't auth related.
+            // Actually, we can't access 'groq' here if it's defined inside try. 
+            // So we will move the groq initialization UP, outside the try, or just re-init text here.
+            const apiKey = process.env.GROQ_API_KEY || (getRequestContext().env as CloudflareEnv).GROQ_API_KEY;
+            if (apiKey) {
+                const debugGroq = new Groq({ apiKey });
+                const list = await debugGroq.models.list();
+                const visionModels = list.data
+                    .map((m: any) => m.id)
+                    .filter((id: string) => id.includes('vision') || id.includes('3.2'))
+                    .join(', ');
+                errorMsg += ` || AVAILABLE MODELS: ${visionModels}`;
+            }
+        } catch (e) {
+            errorMsg += " || Could not list models";
+        }
+
         return NextResponse.json(
-            { error: `Failed: ${error instanceof Error ? error.message : String(error)}` },
+            { error: `Failed: ${errorMsg}` },
             { status: 500 }
         );
     }
