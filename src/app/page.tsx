@@ -28,7 +28,7 @@ export default function Home() {
       const data = await response.json();
 
       if (response.ok) {
-        setResult(data.result);
+        setResult(JSON.stringify(data));
       } else {
         setResult("Les esprits sont brouillés... Veuillez réessayer plus tard. (Erreur: " + (data.error || "Inconnue") + ")");
       }
