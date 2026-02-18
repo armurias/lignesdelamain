@@ -57,8 +57,12 @@ export default function Home() {
           Lignes de la Main
         </h1>
         <p className="text-lg text-gray-300">
-          Uploadez une photo de votre paume et laissez les astres décrypter les secrets de votre avenir.
+          Uploadez une photo de votre paume droite et laissez les astres décrypter les secrets de votre avenir.
         </p>
+        <div className="flex flex-col gap-1 text-sm text-gray-400">
+          <p>✨ Résultats en quelques secondes</p>
+          <p>🔒 L'image est analysée à la volée et immédiatement supprimée</p>
+        </div>
       </header>
 
       <main className="w-full max-w-md z-10">
