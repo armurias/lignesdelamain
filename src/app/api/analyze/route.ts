@@ -1,4 +1,4 @@
-import { groq } from "@/lib/groq";
+import Groq from "groq-sdk";
 import { NextResponse } from "next/server";
 
 export const runtime = 'edge';
@@ -13,6 +13,10 @@ export async function POST(req: Request) {
                 { status: 400 }
             );
         }
+
+        const groq = new Groq({
+            apiKey: process.env.GROQ_API_KEY,
+        });
 
         const chatCompletion = await groq.chat.completions.create({
             messages: [
