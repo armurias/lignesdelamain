@@ -1,5 +1,6 @@
 import Groq from "groq-sdk";
 import { NextResponse } from "next/server";
+import { getRequestContext } from "@cloudflare/next-on-pages";
 
 export const runtime = 'edge';
 
@@ -14,8 +15,15 @@ export async function POST(req: Request) {
             );
         }
 
+        // Try both process.env and Cloudflare context
+        const apiKey = process.env.GROQ_API_KEY || getRequestContext().env.GROQ_API_KEY;
+
+        if (!apiKey) {
+            throw new Error("GROQ_API_KEY is missing. Please check Cloudflare Settings.");
+        }
+
         const groq = new Groq({
-            apiKey: process.env.GROQ_API_KEY,
+            apiKey: apiKey,
         });
 
         const chatCompletion = await groq.chat.completions.create({
