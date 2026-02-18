@@ -61,7 +61,7 @@ export default function Home() {
         </p>
         <div className="flex flex-col gap-1 text-sm text-gray-400">
           <p>✨ Résultats en quelques secondes</p>
-          <p>🔒 L'image est analysée à la volée et immédiatement supprimée</p>
+          <p>🔒 L&apos;image est analysée à la volée et immédiatement supprimée</p>
         </div>
       </header>
 
