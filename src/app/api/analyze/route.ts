@@ -34,8 +34,13 @@ export async function POST(req: Request) {
         }
 
         const genAI = new GoogleGenerativeAI(apiKey);
-        // Using -latest alias which is often more stable for v1beta or fall back to specific version if listed
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
+
+        // List of models to try in order of preference
+        // We try latest alias, then specific, then pro, then vision legacy
+        const candidateModels = ["gemini-1.5-flash", "gemini-1.5-flash-latest", "gemini-1.5-pro", "gemini-pro-vision"];
+
+        let result = null;
+        let lastError = null;
 
         const prompt = `You are an ancient and wise palm reader with a mystical aura. Your task is to analyze the image of a palm provided.
 
@@ -51,15 +56,30 @@ If the image is a valid palm, provide a reading with the following structure:
 
 Tone: Use "Tu" or "Vous" consistently (preferred "Vous"). Be benevolent, mysterious, and slightly theatrical. Use French. Keep it concise (max 200 words).`;
 
-        const result = await model.generateContent([
-            prompt,
-            {
-                inlineData: {
-                    data: base64Data,
-                    mimeType: mimeType
-                }
+        // Try models sequentially
+        for (const modelName of candidateModels) {
+            try {
+                // console.log(`Trying model: ${modelName}`);
+                const model = genAI.getGenerativeModel({ model: modelName });
+                result = await model.generateContent([
+                    prompt,
+                    {
+                        inlineData: {
+                            data: base64Data,
+                            mimeType: mimeType
+                        }
+                    }
+                ]);
+                if (result) break; // Success!
+            } catch (e) {
+                console.warn(`Failed with model ${modelName}:`, e);
+                lastError = e;
             }
-        ]);
+        }
+
+        if (!result) {
+            throw lastError || new Error("All models failed.");
+        }
 
         const response = await result.response;
         const text = response.text();
@@ -71,14 +91,23 @@ Tone: Use "Tu" or "Vous" consistently (preferred "Vous"). Be benevolent, mysteri
 
         let errorMsg = error instanceof Error ? error.message : String(error);
 
-        // EXTRA DEBUG: Try to list models if permitted, to find the valid name
+        // EXTRA DEBUG: Fetch list of models availability from the raw API to see what is actually allowed
         try {
-            // We can't easily list models via the SDK helper without a separate call.
-            // We will try to fetch from the API directly if the SDK fails, or just ask the user to check.
-            // But let's try to pass a hint in the error.
-            errorMsg += " || Hint: Check if 'gemini-1.5-flash' is available in your region.";
+            // Access API Key again for the debug call
+            const apiKey = process.env.GEMINI_API_KEY || (getRequestContext().env as CloudflareEnv).GEMINI_API_KEY;
+            if (apiKey) {
+                const listResp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
+                if (listResp.ok) {
+                    const data = await listResp.json();
+                    // @ts-ignore
+                    const models = data.models?.map(m => m.name.replace('models/', '')).join(', ') || "No models found";
+                    errorMsg += ` || AVAILABLE MODELS FOR YOUR KEY: ${models}`;
+                } else {
+                    errorMsg += ` || Could not list models (API Status: ${listResp.status})`;
+                }
+            }
         } catch (e) {
-            // ignore
+            errorMsg += " || Debug fetch failed";
         }
 
         return NextResponse.json(
