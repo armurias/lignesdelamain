@@ -1,11 +1,7 @@
-import { OpenAI } from "openai";
+import { groq } from "@/lib/groq";
 import { NextResponse } from "next/server";
 
 export const runtime = 'edge';
-
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-});
 
 export async function POST(req: Request) {
     try {
@@ -18,8 +14,7 @@ export async function POST(req: Request) {
             );
         }
 
-        const response = await openai.chat.completions.create({
-            model: "gpt-4o",
+        const chatCompletion = await groq.chat.completions.create({
             messages: [
                 {
                     role: "user",
@@ -37,14 +32,16 @@ export async function POST(req: Request) {
                     ],
                 },
             ],
+            model: "llama-3.2-11b-vision-preview",
+            temperature: 0.7,
             max_tokens: 500,
         });
 
-        const analysis = response.choices[0].message.content;
+        const analysis = chatCompletion.choices[0]?.message?.content || "Les astres sont silencieux...";
 
         return NextResponse.json({ result: analysis });
     } catch (error) {
-        console.error("OpenAI API Error:", error);
+        console.error("Groq API Error:", error);
         return NextResponse.json(
             { error: "Failed to analyze the image." },
             { status: 500 }
