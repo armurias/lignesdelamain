@@ -6,7 +6,7 @@ export const runtime = 'edge';
 
 export async function POST(req: Request) {
     try {
-        const { image } = await req.json();
+        const { image, mode = 'free' } = await req.json();
 
         if (!image) {
             return NextResponse.json(
@@ -42,25 +42,52 @@ export async function POST(req: Request) {
         let result = null;
         let errors = [];
 
-        const prompt = `You are an ancient and wise palm reader with a mystical aura. Your task is to analyze the image of a palm provided.
+        const systemInstruction = `You are an ancient and wise palm reader with a mystical aura. Your task is to analyze the image of a palm provided.
 
 IMPORTANT: First, strictly verify if the image is a clear photo of a human palm.
-- If the image is NOT a palm, or is too blurry/dark to read lines, respond with ONLY: "Je ne vois pas bien les lignes, veuillez reprendre la photo." and stop there.
+- If the image is NOT a palm, or is too blurry/dark to read lines, respond with EXACTLY and ONLY this JSON: {"error": "Je ne vois pas bien les lignes, veuillez reprendre la photo."}
 
-If the image is a valid palm, provide a reading with the following structure:
-1. **L'Atmosphère Générale**: A brief, poetic impression of the hand's energy.
-2. **La Ligne de Vie**: Analyze its length and depth (vitality, groundedness).
-3. **La Ligne de Tête**: Analyze its clear or waving nature (thought process, creativity).
-4. **La Ligne de Cœur**: Analyze its emotional curve (romance, feelings).
-5. **Conclusion Mystique**: A short, cryptic but positive prediction for the future.
+If the image is a valid palm, provide a reading in strict JSON format.
+Tone: Mystical, benevolent, slightly theatrical. Use French. "Vous".`;
 
-Tone: Use "Tu" or "Vous" consistently (preferred "Vous"). Be benevolent, mysterious, and slightly theatrical. Use French. Keep it concise (max 200 words).`;
+        const promptFree = `
+            Analyze the palm and provide a "Free Reading" (teaser).
+            Return valid JSON with this structure:
+            {
+                "atmosphere": "A brief, poetic impression of the hand's energy (max 2 sentences).",
+                "dominant_trait": "Identified dominant trait (e.g., 'Creative', 'Grounded').",
+                "teaser": "A mysterious hint about their future (e.g., 'A major change is coming in your career...').",
+                "is_premium": false
+            }
+        `;
+
+        const promptPremium = `
+            Analyze the palm and provide a "Premium Complete Reading".
+            Return valid JSON with this structure:
+            {
+                "atmosphere": "A deep, poetic impression of the hand's energy.",
+                "life_line": "Detailed analysis of the Life Line (Vitality, Health, Major Changes).",
+                "head_line": "Detailed analysis of the Head Line (Intellect, Focus, Creativity).",
+                "heart_line": "Detailed analysis of the Heart Line (Emotions, Relationships, Love).",
+                "fate_line": "Analysis of the Fate Line (Career, Destiny) if visible.",
+                "mounts": "Analysis of significant Mounts (Venus, Jupiter, etc.).",
+                "future_prediction": "A comprehensive prediction for the next 12 months.",
+                "is_premium": true
+            }
+        `;
+
+        const prompt = mode === 'premium' ? promptPremium : promptFree;
 
         // Try models sequentially
         for (const modelName of candidateModels) {
             try {
                 // console.log(`Trying model: ${modelName}`);
-                const model = genAI.getGenerativeModel({ model: modelName });
+                const model = genAI.getGenerativeModel({
+                    model: modelName,
+                    systemInstruction: systemInstruction,
+                    generationConfig: { responseMimeType: "application/json" }
+                });
+
                 result = await model.generateContent([
                     prompt,
                     {
@@ -84,7 +111,7 @@ Tone: Use "Tu" or "Vous" consistently (preferred "Vous"). Be benevolent, mysteri
         const response = await result.response;
         const text = response.text();
 
-        return NextResponse.json({ result: text });
+        return NextResponse.json(JSON.parse(text));
 
     } catch (error) {
         console.error("Gemini API Error:", error);
