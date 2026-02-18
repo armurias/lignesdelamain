@@ -56,7 +56,7 @@ Tone: Use "Tu" or "Vous" consistently (preferred "Vous"). Be benevolent, mysteri
                     ],
                 },
             ],
-            model: "llama-3.2-11b-vision-preview",
+            model: "llama-3.2-90b-vision-preview",
             temperature: 0.7,
             max_tokens: 500,
         });
