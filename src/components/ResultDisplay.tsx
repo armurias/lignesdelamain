@@ -49,11 +49,12 @@ export default function ResultDisplay({ result, image, onReset }: ResultDisplayP
                 setEmailSent(true);
                 setEmail("");
             } else {
-                alert("Erreur lors de l'envoi. Vérifiez votre adresse.");
+                const data = await res.json();
+                alert(data.error || "Erreur lors de l'envoi. Vérifiez votre adresse ou réessayez plus tard.");
             }
         } catch (e) {
             console.error(e);
-            alert("Impossible d'envoyer l'email pour le moment.");
+            alert("Impossible d'envoyer l'email. Service indisponible.");
         } finally {
             setSendingEmail(false);
         }
