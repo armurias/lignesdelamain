@@ -36,8 +36,8 @@ export async function POST(req: Request) {
         const genAI = new GoogleGenerativeAI(apiKey);
 
         // List of models to try in order of preference
-        // We try latest alias, then specific, then pro, then vision legacy
-        const candidateModels = ["gemini-1.5-flash", "gemini-1.5-flash-latest", "gemini-1.5-pro", "gemini-pro-vision"];
+        // Based on user's available models: gemini-2.0-flash, gemini-2.5-flash, etc.
+        const candidateModels = ["gemini-2.0-flash", "gemini-2.5-flash", "gemini-2.0-flash-lite"];
 
         let result = null;
         let lastError = null;
