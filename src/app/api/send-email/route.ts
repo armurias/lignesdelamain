@@ -62,6 +62,24 @@ export async function POST(req: Request) {
 
         if (data.teaser) analysisHtml += `<h2>🔮 Aperçu</h2><p>${data.teaser}</p>`;
 
+        if (!data.is_premium) {
+            analysisHtml += `
+                <div style="background-color: #f3e8ff; border: 1px solid #d8b4fe; border-radius: 8px; padding: 20px; margin-top: 30px; text-align: center;">
+                    <h3 style="color: #6b21a8; margin-top: 0;">🔓 Débloquez votre destinée</h3>
+                    <p style="color: #4a044e; margin-bottom: 20px;">
+                        Optez pour la version Premium pour découvrir :<br>
+                        • Votre espérance de vie<br>
+                        • Votre compatibilité amoureuse<br>
+                        • Vos opportunités de carrière<br>
+                        • Des prédictions détaillées sur 12 mois
+                    </p>
+                    <a href="https://liremamain.fr?mode=premium" style="background-color: #9333ea; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">
+                        Obtenir ma lecture complète
+                    </a>
+                </div>
+            `;
+        }
+
         analysisHtml += `
                     <div style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px; text-align: center; font-size: 12px; color: #888;">
                         <p>© ${new Date().getFullYear()} Lignes de la Main - Armurias</p>
