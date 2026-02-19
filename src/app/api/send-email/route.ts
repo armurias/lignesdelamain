@@ -23,9 +23,9 @@ export async function POST(req: Request) {
         const apiKey = process.env.RESEND_API_KEY;
 
         if (!apiKey) {
-            console.error("RESEND_API_KEY is missing");
+            console.error("CRITICAL: RESEND_API_KEY is missing in environment variables");
             return NextResponse.json(
-                { error: "Server configuration error" },
+                { error: "Server configuration error: Missing API Key" },
                 { status: 500 }
             );
         }
@@ -86,8 +86,11 @@ export async function POST(req: Request) {
 
         if (!resendResponse.ok) {
             const errorData = await resendResponse.json();
-            console.error("Resend API Error:", errorData);
-            throw new Error("Failed to send email via Resend");
+            console.error("Resend API Error:", JSON.stringify(errorData, null, 2));
+            return NextResponse.json(
+                { error: `Resend Error: ${errorData.message || 'Unknown error'}` },
+                { status: resendResponse.status }
+            );
         }
 
         return NextResponse.json({ success: true });
@@ -95,7 +98,7 @@ export async function POST(req: Request) {
     } catch (error) {
         console.error("Email Error:", error);
         return NextResponse.json(
-            { error: "Failed to send email" },
+            { error: "Internal Server Error during email sending" },
             { status: 500 }
         );
     }
