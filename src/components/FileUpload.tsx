@@ -58,7 +58,7 @@ export default function FileUpload({ image, onImageChange, analyzing, result, on
                 <>
                     <div
                         className="flex flex-col items-center gap-6 cursor-pointer py-10"
-                        onClick={() => fileInputRef.current?.click()}
+                        onClick={() => !analyzing && fileInputRef.current?.click()}
                     >
                         <div className="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center border border-white/10">
                             <Upload className="w-8 h-8 text-purple-400" />
@@ -76,6 +76,19 @@ export default function FileUpload({ image, onImageChange, analyzing, result, on
                 <div className="space-y-6">
                     <div className="relative w-full aspect-[3/4] rounded-lg overflow-hidden border border-white/20">
                         <Image src={image} alt="Uploaded Hand" fill className="object-cover" />
+
+                        {/* Loading Overlay */}
+                        {analyzing && (
+                            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center z-10 p-6">
+                                <div className="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+                                <p className="text-white font-semibold text-lg animate-pulse">
+                                    Les prévisions sont en cours...
+                                </p>
+                                <p className="text-white/70 text-sm mt-2">
+                                    Veuillez patienter
+                                </p>
+                            </div>
+                        )}
                     </div>
 
                     {!result && !analyzing && (
