@@ -14,9 +14,28 @@ interface AnalysisResult {
     heart_line?: string;
     fate_line?: string;
     mounts?: string;
+    love?: string;
+    health?: string;
+    work?: string;
+    money?: string;
     future_prediction?: string;
     is_premium?: boolean;
 }
+
+// ... (existing code)
+
+{/* Premium Sections (Hidden or Shown) */ }
+{ renderSection("❤️ Ligne de Cœur", parsedResult.heart_line, !is_premium) }
+{ renderSection("🧠 Ligne de Tête", parsedResult.head_line, !is_premium) }
+{ renderSection("🧬 Ligne de Vie", parsedResult.life_line, !is_premium) }
+{ renderSection("⛰️ Les Monts", parsedResult.mounts, !is_premium) }
+
+{ renderSection("💖 Amour & Relations", parsedResult.love, !is_premium) }
+{ renderSection("🌿 Santé & Vitalité", parsedResult.health, !is_premium) }
+{ renderSection("💼 Travail & Carrière", parsedResult.work, !is_premium) }
+{ renderSection("💰 Argent & Prospérité", parsedResult.money, !is_premium) }
+
+{ renderSection("🌟 Prédictions 12 Mois", parsedResult.future_prediction, !is_premium) }
 
 interface ResultDisplayProps {
     result: string | null; // We receive the JSON string from the API
@@ -157,6 +176,12 @@ export default function ResultDisplay({ result, image, onReset }: ResultDisplayP
                     {renderSection("🧠 Ligne de Tête", parsedResult.head_line, !is_premium)}
                     {renderSection("🧬 Ligne de Vie", parsedResult.life_line, !is_premium)}
                     {renderSection("⛰️ Les Monts", parsedResult.mounts, !is_premium)}
+
+                    {renderSection("💖 Amour & Relations", parsedResult.love, !is_premium)}
+                    {renderSection("🌿 Santé & Vitalité", parsedResult.health, !is_premium)}
+                    {renderSection("💼 Travail & Carrière", parsedResult.work, !is_premium)}
+                    {renderSection("💰 Argent & Prospérité", parsedResult.money, !is_premium)}
+
                     {renderSection("🌟 Prédictions 12 Mois", parsedResult.future_prediction, !is_premium)}
                 </div>
 
