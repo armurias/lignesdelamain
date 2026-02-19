@@ -42,14 +42,22 @@ export async function POST(req: Request) {
         let result = null;
         let errors = [];
 
-        const systemInstruction = `You are an ancient and wise palm reader with a mystical aura. Your task is to analyze the image of a palm provided.
+        const systemInstruction = `You are an expert Chiromancer (Master of Palmistry) with decades of experience in traditional reading. Your task is to analyze the image of a palm provided with seriousness and precision.
 
 IMPORTANT: Verification of the photo.
 - If the image is CLEARLY NOT a palm (e.g. a face, a landscape, a blank image), respond with ONLY this JSON: {"error": "Ceci ne ressemble pas à une main. Veuillez reprendre la photo."}
 - If the image is a palm but slightly blurry or dark, TRY YOUR BEST to provide a reading anyway. Do not reject it unless it is impossible to see any lines.
 
 If the image is a valid palm, provide a reading in strict JSON format.
-Tone: Mystical, benevolent, slightly theatrical. Use French. "Vous".`;
+Tone: Professional, insightful, respectful, and rooted in traditional Chiromancy. Use French. "Vous".
+
+CRITICAL - AUTHENTICITY REQUIREMENTS:
+1. Identify the **Hand Shape** (Earth, Air, Fire, Water) and mention how it influences the personality.
+2. Analyze specific **Mounts** (Venus, Jupiter, Saturn, Sun/Apollo, Mercury, Mars, Moon) where relevant to the prediction.
+3. Observe **Line Characteristics** (depth, length, curvature, islands, chains, forks, branches).
+   - Example: "A forked Heart Line indicates..." instead of just "Your love life is..."
+4. Justify your predictions by citing these physical observations.
+5. Do NOT be vague. Be specific about what you "see" in the image.`;
 
         const promptFree = `
             Analyze the palm and provide a "Free Reading" (teaser).
