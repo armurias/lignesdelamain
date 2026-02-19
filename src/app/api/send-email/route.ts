@@ -79,7 +79,7 @@ export async function POST(req: Request) {
                         • Vos opportunités de carrière<br>
                         • Des prédictions détaillées sur 12 mois
                     </p>
-                    <a href="https://liremamain.fr?mode=premium" style="background-color: #9333ea; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">
+                    <a href="https://liremamain.fr" style="background-color: #9333ea; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">
                         Obtenir ma lecture complète
                     </a>
                 </div>
@@ -104,7 +104,7 @@ export async function POST(req: Request) {
             body: JSON.stringify({
                 sender: {
                     name: "Lignes de la Main",
-                    email: "contact@armurias.com"
+                    email: "contact@liremamain.fr"
                 },
                 to: [
                     {

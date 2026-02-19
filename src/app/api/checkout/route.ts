@@ -18,7 +18,7 @@ export async function POST(req: Request) {
         });
 
         // Current host for success/cancel URLs
-        const origin = req.headers.get('origin') || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+        const origin = req.headers.get('origin') || process.env.NEXT_PUBLIC_APP_URL || 'https://liremamain.fr';
 
         const session = await stripe.checkout.sessions.create({
             line_items: [
@@ -28,7 +28,7 @@ export async function POST(req: Request) {
                         product_data: {
                             name: 'Lecture Complète des Lignes de la Main',
                             description: 'Analyse détaillée Amour, Travail, Santé & Prédictions 12 mois.',
-                            images: ['https://lignesdelamain.pages.dev/hand-preview.jpg'], // Ideally host a real preview image
+                            images: ['https://liremamain.fr/hand-preview.jpg'], // Ideally host a real preview image
                         },
                         unit_amount: 299, // 2.99 EUR
                     },
