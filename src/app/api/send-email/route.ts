@@ -77,7 +77,7 @@ export async function POST(req: Request) {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                from: "Lignes de la Main <onboarding@resend.dev>", // Default testing sender for Resend
+                from: "Lignes de la Main <contact@armurias.com>",
                 to: [email],
                 subject: "✨ Votre lecture des lignes de la main",
                 html: analysisHtml
