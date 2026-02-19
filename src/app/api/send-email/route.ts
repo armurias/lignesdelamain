@@ -20,10 +20,10 @@ export async function POST(req: Request) {
             );
         }
 
-        const apiKey = process.env.RESEND_API_KEY;
+        const apiKey = process.env.BREVO_API_KEY;
 
         if (!apiKey) {
-            console.error("CRITICAL: RESEND_API_KEY is missing in environment variables");
+            console.error("CRITICAL: BREVO_API_KEY is missing in environment variables");
             return NextResponse.json(
                 { error: "Server configuration error: Missing API Key" },
                 { status: 500 }
@@ -70,26 +70,34 @@ export async function POST(req: Request) {
             </div>
         `;
 
-        const resendResponse = await fetch("https://api.resend.com/emails", {
+        const brevoResponse = await fetch("https://api.brevo.com/v3/smtp/email", {
             method: "POST",
             headers: {
-                "Authorization": `Bearer ${apiKey}`,
-                "Content-Type": "application/json"
+                "api-key": apiKey,
+                "Content-Type": "application/json",
+                "accept": "application/json"
             },
             body: JSON.stringify({
-                from: "Lignes de la Main <contact@armurias.com>",
-                to: [email],
+                sender: {
+                    name: "Lignes de la Main",
+                    email: "contact@armurias.com"
+                },
+                to: [
+                    {
+                        email: email
+                    }
+                ],
                 subject: "✨ Votre lecture des lignes de la main",
-                html: analysisHtml
+                htmlContent: analysisHtml
             })
         });
 
-        if (!resendResponse.ok) {
-            const errorData = await resendResponse.json();
-            console.error("Resend API Error:", JSON.stringify(errorData, null, 2));
+        if (!brevoResponse.ok) {
+            const errorData = await brevoResponse.json();
+            console.error("Brevo API Error:", JSON.stringify(errorData, null, 2));
             return NextResponse.json(
-                { error: `Resend Error: ${errorData.message || 'Unknown error'}` },
-                { status: resendResponse.status }
+                { error: `Brevo Error: ${errorData.message || 'Unknown error'}` },
+                { status: brevoResponse.status }
             );
         }
 
