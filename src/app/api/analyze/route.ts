@@ -72,11 +72,11 @@ Tone: Mystical, benevolent, slightly theatrical. Use French. "Vous".`;
                 "heart_line": "Detailed analysis of the Heart Line (Emotions, Relationships, Love).",
                 "fate_line": "Analysis of the Fate Line (Career, Destiny) if visible.",
                 "mounts": "Analysis of significant Mounts (Venus, Jupiter, etc.).",
-                "love": "Detailed analysis of emotional life and relationships.",
-                "health": "Insights on vitality and well-being (disclaimer: not medical advice).",
-                "work": "Career path, ambition, and success analysis.",
+                "love": "Detailed analysis of love compatibility and emotional life.",
+                "health": "Insights on vitality and symbolic life expectancy based on palmistry traditions (disclaimer: not scientific/medical).",
+                "work": "Analysis of career opportunities, ambition, and success.",
                 "money": "Financial prospects and wealth indicators.",
-                "future_prediction": "A comprehensive prediction for the next 12 months.",
+                "future_prediction": "A detailed prediction for the next 12 months.",
                 "is_premium": true
             }
         `;

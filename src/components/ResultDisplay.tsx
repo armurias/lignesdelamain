@@ -164,9 +164,9 @@ export default function ResultDisplay({ result, image, onReset }: ResultDisplayP
                     {renderSection("🧬 Ligne de Vie", parsedResult.life_line, !is_premium)}
                     {renderSection("⛰️ Les Monts", parsedResult.mounts, !is_premium)}
 
-                    {renderSection("💖 Amour & Relations", parsedResult.love, !is_premium)}
-                    {renderSection("🌿 Santé & Vitalité", parsedResult.health, !is_premium)}
-                    {renderSection("💼 Travail & Carrière", parsedResult.work, !is_premium)}
+                    {renderSection("💖 Amour & Compatibilité", parsedResult.love, !is_premium)}
+                    {renderSection("🌿 Vitalité & Espérance de Vie", parsedResult.health, !is_premium)}
+                    {renderSection("💼 Carrière & Opportunités", parsedResult.work, !is_premium)}
                     {renderSection("💰 Argent & Prospérité", parsedResult.money, !is_premium)}
 
                     {renderSection("🌟 Prédictions 12 Mois", parsedResult.future_prediction, !is_premium)}
