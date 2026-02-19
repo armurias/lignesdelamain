@@ -60,6 +60,12 @@ export async function POST(req: Request) {
         if (data.mounts) analysisHtml += `<h2>⛰️ Les Monts</h2><p>${data.mounts}</p>`;
         if (data.future_prediction) analysisHtml += `<h2>🌟 Prédictions (12 mois)</h2><p>${data.future_prediction}</p>`;
 
+        // Extended Premium sections
+        if (data.love) analysisHtml += `<h2>💖 Amour & Relations</h2><p>${data.love}</p>`;
+        if (data.health) analysisHtml += `<h2>🌿 Santé & Vitalité</h2><p>${data.health}</p>`;
+        if (data.work) analysisHtml += `<h2>💼 Travail & Carrière</h2><p>${data.work}</p>`;
+        if (data.money) analysisHtml += `<h2>💰 Argent & Prospérité</h2><p>${data.money}</p>`;
+
         if (data.teaser) analysisHtml += `<h2>🔮 Aperçu</h2><p>${data.teaser}</p>`;
 
         if (!data.is_premium) {
