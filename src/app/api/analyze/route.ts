@@ -1,6 +1,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
 import { getRequestContext } from "@cloudflare/next-on-pages";
+import { sendAdminNotification } from "@/lib/notify";
 
 export const runtime = 'edge';
 
@@ -27,7 +28,8 @@ export async function POST(req: Request) {
         const base64Data = matches[2];
 
         // Access API Key
-        const apiKey = process.env.GEMINI_API_KEY || (getRequestContext().env as CloudflareEnv).GEMINI_API_KEY;
+        const env = getRequestContext().env as any;
+        const apiKey = process.env.GEMINI_API_KEY || env.GEMINI_API_KEY;
 
         if (!apiKey) {
             throw new Error("GEMINI_API_KEY is missing. Please check Cloudflare Settings.");
@@ -124,7 +126,13 @@ CRITICAL - AUTHENTICITY REQUIREMENTS:
         const response = await result.response;
         const text = response.text();
 
-        return NextResponse.json(JSON.parse(text));
+        // Send admin notification asynchronously (fire and forget)
+        const parsedData = JSON.parse(text);
+        void sendAdminNotification(mode as 'free' | 'premium', {
+            timestamp: new Date().toISOString()
+        });
+
+        return NextResponse.json(parsedData);
 
     } catch (error) {
         console.error("Gemini API Error:", error);
@@ -134,7 +142,8 @@ CRITICAL - AUTHENTICITY REQUIREMENTS:
         // EXTRA DEBUG: Fetch list of models availability from the raw API to see what is actually allowed
         try {
             // Access API Key again for the debug call
-            const apiKey = process.env.GEMINI_API_KEY || (getRequestContext().env as CloudflareEnv).GEMINI_API_KEY;
+            const env = getRequestContext().env as any;
+            const apiKey = process.env.GEMINI_API_KEY || env.GEMINI_API_KEY;
             if (apiKey) {
                 const listResp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
                 if (listResp.ok) {
