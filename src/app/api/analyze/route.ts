@@ -126,9 +126,9 @@ CRITICAL - AUTHENTICITY REQUIREMENTS:
         const response = await result.response;
         const text = response.text();
 
-        // Send admin notification asynchronously (fire and forget)
+        // Send admin notification
         const parsedData = JSON.parse(text);
-        void sendAdminNotification(mode as 'free' | 'premium', {
+        await sendAdminNotification(mode as 'free' | 'premium', {
             timestamp: new Date().toISOString()
         });
 
