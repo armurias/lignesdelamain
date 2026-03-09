@@ -9,6 +9,7 @@ export default function Home() {
   const [image, setImage] = useState<string | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
   const [result, setResult] = useState<string | null>(null);
+  const [premiumImageMissing, setPremiumImageMissing] = useState(false);
 
   const analyzeHand = async (imgToAnalyze?: string, mode: 'free' | 'premium' = 'free') => {
     const currentImage = imgToAnalyze || image;
@@ -48,20 +49,50 @@ export default function Home() {
 
   // Check for premium return
   useEffect(() => {
-    // Check if we are returning from a successful payment
-    if (typeof window !== 'undefined') {
+    // Check if we are returning from a premium flow.
+    if (typeof window === 'undefined') return;
+
+    const run = async () => {
       const params = new URLSearchParams(window.location.search);
       const mode = params.get('mode');
+      if (mode !== 'premium') return;
 
-      if (mode === 'premium') {
-        const savedImage = localStorage.getItem('palm_image_for_premium');
-        if (savedImage) {
-          setImage(savedImage);
-          // Trigger premium analysis immediately
-          analyzeHand(savedImage, 'premium');
+      const token = params.get('token');
+      let recoveredImage: string | null = null;
+
+      if (token) {
+        try {
+          const response = await fetch(`/api/premium-image?token=${encodeURIComponent(token)}`, {
+            method: 'GET',
+            cache: 'no-store',
+          });
+          if (response.ok) {
+            const data = await response.json() as { image?: unknown };
+            if (typeof data.image === 'string' && data.image.startsWith('data:image/')) {
+              recoveredImage = data.image;
+              localStorage.setItem('palm_image_for_premium', recoveredImage);
+            }
+          }
+        } catch (error) {
+          console.error('Premium image token recovery failed:', error);
         }
       }
-    }
+
+      if (!recoveredImage) {
+        recoveredImage = localStorage.getItem('palm_image_for_premium');
+      }
+
+      if (recoveredImage) {
+        setPremiumImageMissing(false);
+        setImage(recoveredImage);
+        analyzeHand(recoveredImage, 'premium');
+      } else {
+        setPremiumImageMissing(true);
+      }
+    };
+
+    void run();
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -92,6 +123,14 @@ export default function Home() {
       </header>
 
       <main className="w-full max-w-md z-10">
+        {premiumImageMissing && (
+          <div className="mb-4 rounded-xl border border-yellow-400/30 bg-yellow-500/10 p-4 text-sm text-yellow-100">
+            Vous etes bien sur le parcours Premium. Pour des raisons de confidentialite, la photo
+            n&apos;est pas conservee sur nos serveurs: importez a nouveau votre paume pour lancer
+            l&apos;analyse complete.
+          </div>
+        )}
+
         <FileUpload
           image={image}
           onImageChange={setImage}

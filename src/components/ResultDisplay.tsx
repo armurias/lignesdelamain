@@ -40,6 +40,14 @@ export default function ResultDisplay({ result, image, onReset }: ResultDisplayP
     const handleSendEmail = async () => {
         if (!email) return;
         setSendingEmail(true);
+        const currentImage = image || localStorage.getItem('palm_image_for_premium');
+
+        // Keep the current image locally so an email click on the same device
+        // can continue directly to premium without re-upload.
+        if (currentImage) {
+            localStorage.setItem('palm_image_for_premium', currentImage);
+        }
+
         try {
             const res = await fetch('/api/send-email', {
                 method: 'POST',
@@ -47,7 +55,9 @@ export default function ResultDisplay({ result, image, onReset }: ResultDisplayP
                 body: JSON.stringify({
                     email,
                     result: result,
-                    date: new Date().toLocaleDateString('fr-FR')
+                    date: new Date().toLocaleDateString('fr-FR'),
+                    appOrigin: window.location.origin,
+                    image: currentImage
                 })
             });
 
