@@ -66,8 +66,15 @@ function buildPremiumImageCacheKey(token: string): Request {
     return new Request(`https://premium-image-cache.local/${encodeURIComponent(token)}`);
 }
 
+async function getPremiumImageCache(): Promise<Cache> {
+    const cacheStorage = caches as CacheStorage & { default?: Cache };
+    if (cacheStorage.default) return cacheStorage.default;
+    return caches.open("premium-image-cache");
+}
+
 async function storePremiumImageToken(token: string, image: string): Promise<boolean> {
     try {
+        const cache = await getPremiumImageCache();
         const payload = JSON.stringify({
             image,
             createdAt: Date.now(),
@@ -78,7 +85,7 @@ async function storePremiumImageToken(token: string, image: string): Promise<boo
                 "Cache-Control": `public, max-age=${PREMIUM_IMAGE_TOKEN_TTL_SECONDS}`,
             },
         });
-        await caches.default.put(buildPremiumImageCacheKey(token), response);
+        await cache.put(buildPremiumImageCacheKey(token), response);
         return true;
     } catch (error) {
         console.error("Failed to store premium image token:", error);

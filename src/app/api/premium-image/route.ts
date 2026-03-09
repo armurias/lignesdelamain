@@ -10,6 +10,12 @@ function buildPremiumImageCacheKey(token: string): Request {
     return new Request(`https://premium-image-cache.local/${encodeURIComponent(token)}`);
 }
 
+async function getPremiumImageCache(): Promise<Cache> {
+    const cacheStorage = caches as CacheStorage & { default?: Cache };
+    if (cacheStorage.default) return cacheStorage.default;
+    return caches.open("premium-image-cache");
+}
+
 export async function GET(req: Request) {
     try {
         const { searchParams } = new URL(req.url);
@@ -20,7 +26,8 @@ export async function GET(req: Request) {
         }
 
         const cacheKey = buildPremiumImageCacheKey(token);
-        const cached = await caches.default.match(cacheKey);
+        const cache = await getPremiumImageCache();
+        const cached = await cache.match(cacheKey);
 
         if (!cached) {
             return NextResponse.json({ error: "Token expired or not found" }, { status: 404 });
