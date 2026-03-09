@@ -40,6 +40,7 @@ export default function ResultDisplay({ result, image, onReset }: ResultDisplayP
     const handleSendEmail = async () => {
         if (!email) return;
         setSendingEmail(true);
+        localStorage.setItem('client_email_for_notifications', email.trim());
         const currentImage = image || localStorage.getItem('palm_image_for_premium');
 
         // Keep the current image locally so an email click on the same device

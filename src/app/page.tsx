@@ -54,10 +54,17 @@ export default function Home() {
         image: string;
         mode: "free" | "premium";
         premiumAccessToken?: string;
+        clientEmail?: string;
       } = {
         image: currentImage,
         mode,
       };
+
+      const clientEmail =
+        typeof window !== "undefined" ? localStorage.getItem("client_email_for_notifications") : null;
+      if (clientEmail) {
+        payload.clientEmail = clientEmail;
+      }
 
       if (mode === "premium") {
         const tokenFromStorage =

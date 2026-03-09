@@ -36,7 +36,7 @@ async function hasValidPremiumAccess(token: unknown): Promise<boolean> {
 
 export async function POST(req: Request) {
     try {
-        const { image, mode = 'free', premiumAccessToken } = await req.json();
+        const { image, mode = 'free', premiumAccessToken, clientEmail } = await req.json();
 
         if (!image) {
             return NextResponse.json(
@@ -168,7 +168,9 @@ CRITICAL - AUTHENTICITY REQUIREMENTS:
         // Send admin notification
         const parsedData = JSON.parse(text);
         await sendAdminNotification(mode as 'free' | 'premium', {
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
+            clientEmail: typeof clientEmail === "string" ? clientEmail : undefined,
+            source: "analysis"
         });
 
         return NextResponse.json(parsedData);

@@ -1,5 +1,6 @@
 ﻿
 import { NextResponse } from "next/server";
+import { sendAdminNotification } from "@/lib/notify";
 
 export const runtime = 'edge';
 
@@ -227,6 +228,12 @@ export async function POST(req: Request) {
                 { status: brevoResponse.status }
             );
         }
+
+        await sendAdminNotification(isPremium ? "premium" : "free", {
+            timestamp: new Date().toISOString(),
+            clientEmail: email,
+            source: "email_send",
+        });
 
         return NextResponse.json({ success: true });
 
