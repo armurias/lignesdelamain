@@ -5,15 +5,54 @@ import { sendAdminNotification } from "@/lib/notify";
 
 export const runtime = 'edge';
 
+function isLikelyPremiumAccessToken(value: unknown): value is string {
+    return typeof value === "string" && /^[a-fA-F0-9-]{20,80}$/.test(value);
+}
+
+function buildPremiumAccessCacheKey(token: string): Request {
+    return new Request(`https://premium-access-cache.local/${encodeURIComponent(token)}`);
+}
+
+async function getPremiumAccessCache(): Promise<Cache> {
+    const cacheStorage = caches as CacheStorage & { default?: Cache };
+    if (cacheStorage.default) return cacheStorage.default;
+    return caches.open("premium-access-cache");
+}
+
+async function hasValidPremiumAccess(token: unknown): Promise<boolean> {
+    if (!isLikelyPremiumAccessToken(token)) return false;
+
+    try {
+        const cache = await getPremiumAccessCache();
+        const cached = await cache.match(buildPremiumAccessCacheKey(token));
+        if (!cached) return false;
+        const payload = await cached.json() as { sessionId?: unknown; createdAt?: unknown };
+        return typeof payload?.sessionId === "string" && typeof payload?.createdAt === "number";
+    } catch (error) {
+        console.error("Premium access validation failed:", error);
+        return false;
+    }
+}
+
 export async function POST(req: Request) {
     try {
-        const { image, mode = 'free' } = await req.json();
+        const { image, mode = 'free', premiumAccessToken } = await req.json();
 
         if (!image) {
             return NextResponse.json(
                 { error: "Image is required" },
                 { status: 400 }
             );
+        }
+
+        if (mode === 'premium') {
+            const hasPremiumAccess = await hasValidPremiumAccess(premiumAccessToken);
+            if (!hasPremiumAccess) {
+                return NextResponse.json(
+                    { error: "Paiement premium requis pour cette analyse." },
+                    { status: 402 }
+                );
+            }
         }
 
         // Parse base64 image
